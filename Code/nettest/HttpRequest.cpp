@@ -1,29 +1,94 @@
 #include "HttpRequest.h"
 
-HttpRequest::HttpRequest(QString url, const QVariant &variant, QObject *parent) : QObject(parent)
+HttpRequest::HttpRequest(QNetworkReply *reply, QObject *parent) : QObject(parent),
+    m_reply(reply),
+    m_JSONResponse(0),
+    m_StringResponse(0),
+    m_DataResponse(0),
+    m_Progress(0)
 {
-    variant.isValid()
+    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(reciveError(QNetworkReply::NetworkError)));
+    connect(reply, SIGNAL(uploadProgress(qint64 ,qint64)), this, SLOT( uploadProgress(qint64 ,qint64)));
+    connect(reply, SIGNAL(downloadProgress(qint64 ,qint64)), this, SLOT( downloadProgress(qint64 ,qint64)));
+    connect(reply, SIGNAL(finished()), this, SLOT( finished()));
 }
 
-void HttpRequest::responseString(HttpJSONResponse response)
+HttpRequest *HttpRequest::responseString(HttpStringResponse response)
 {
-
+    m_StringResponse = response;
+    return this;
 }
 
-void HttpRequest::responseJSON(HttpStringResponse response)
+HttpRequest *HttpRequest::responseJSON(HttpJSONResponse response)
 {
-
+    m_JSONResponse = response;
+    return this;
 }
 
-void HttpRequest::responseData(HttpDataResponse response)
+HttpRequest *HttpRequest::responseData(HttpDataResponse response)
 {
+    m_DataResponse = response;
+    return this;
+}
 
+HttpRequest *HttpRequest::progress(HttpProgress response)
+{
+    m_Progress = response;
+    return this;
 }
 
 QNetworkRequest HttpRequest::creatNetworkRequest()
 {
-    QJsonDocument jsonDocument = QJsonDocument::fromVariant(parameters);
+//    QJsonDocument jsonDocument = QJsonDocument::fromVariant(parameters);
 
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/json"));
+//    QNetworkRequest request(url);
+//    request.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/json"));
+}
+
+void HttpRequest::reciveError(QNetworkReply::NetworkError errorCode)
+{
+    qDebug() << "upLoadError  errorCode: " << (int)errorCode;
+}
+
+void HttpRequest::uploadProgress(qint64 bytesSent, qint64 bytesTotal)
+{
+    qDebug() << "bytesSent: " << bytesSent << "  bytesTotal: "<< bytesTotal;
+}
+
+void HttpRequest::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
+{
+    qDebug() << "bytesSent: " << bytesReceived << "  bytesTotal: "<< bytesTotal;
+}
+
+void HttpRequest::finished()
+{
+    if(m_reply->error() == QNetworkReply::NoError){
+        qDebug()<<"no error.....";
+        QByteArray bytes = m_reply->readAll();  //获取字节
+        if(m_JSONResponse) {
+            QJsonParseError error;
+            QJsonDocument jsonDocument = QJsonDocument::fromJson(bytes,&error);
+            m_JSONResponse(error.error == QJsonParseError::NoError,jsonDocument);
+        }
+        if(m_StringResponse){
+            m_StringResponse(true,QString(bytes));
+        }
+        if(m_DataResponse){
+            m_DataResponse(true,bytes);
+        }
+
+//        ;  //转化为字符串
+//        qDebug()<<result;
+    } else {
+        if(m_JSONResponse) {
+            m_JSONResponse(false,QJsonDocument());
+        }
+        if(m_StringResponse){
+            m_StringResponse(true,QString());
+        }
+        if(m_DataResponse){
+            m_DataResponse(true,QByteArray());
+        }
+    }
+    m_reply->error(m_reply->error());
 }

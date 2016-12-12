@@ -4,32 +4,39 @@
 #include <QObject>
 #include <QtNetwork>
 
-typedef std::function< void(const QJsonDocument &document,const QNetworkReply::NetworkError &error) > HttpJSONResponse;
-typedef std::function< void(const QString &string,const QNetworkReply::NetworkError &error) > HttpStringResponse;
-typedef std::function< void(const QByteArray &data,const QNetworkReply::NetworkError &error) > HttpDataResponse;
+typedef std::function< void(const bool success, const QJsonDocument &document) > HttpJSONResponse;
+typedef std::function< void(const bool success, const QString &string) > HttpStringResponse;
+typedef std::function< void(const bool success, const QByteArray &data) > HttpDataResponse;
 typedef std::function< void(const qint64 bytedone, const qint64 bytetotal) > HttpProgress;
-
-struct JQNetworkOnReceivedCallbackPackage
-{
-    std::function< void(const QJsonDocument &document) > succeedCallback = nullptr;
-    std::function< void(const QNetworkReply::NetworkError &error) > failCallback = nullptr;
-    std::function< void(const float &progress) > progressCallback = nullptr;
-};
 
 class HttpRequest : public QObject
 {
     Q_OBJECT
 public:
-    explicit HttpRequest(QString url,const QVariant &variant = QVariant(),QObject *parent = 0);
+    explicit HttpRequest(QNetworkReply *reply,QObject *parent = 0);
 
-    void responseString(HttpJSONResponse response);
-    void responseJSON(HttpStringResponse response);
-    void responseData(HttpDataResponse response);
+    HttpRequest *responseString(HttpStringResponse response);
+    HttpRequest *responseJSON(HttpJSONResponse response);
+    HttpRequest *responseData(HttpDataResponse response);
+    HttpRequest *progress(HttpProgress response);
 
     QNetworkRequest creatNetworkRequest();
 signals:
 
 public slots:
+
+private:
+    QNetworkReply *m_reply;
+    HttpJSONResponse m_JSONResponse;
+    HttpStringResponse m_StringResponse;
+    HttpDataResponse m_DataResponse;
+    HttpProgress m_Progress;
+
+private slots:
+    void reciveError(QNetworkReply::NetworkError errorCode);
+    void uploadProgress(qint64 bytesSent, qint64 bytesTotal);
+    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+    void finished();
 };
 
 #endif // HTTPREQUEST_H

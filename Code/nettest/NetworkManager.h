@@ -17,10 +17,7 @@ public:
     static NetworkManager *self();
 
     HttpRequest *post(const QString url,
-              const QMap<QString,QVariant>,
-              std::function< void(const QJsonDocument &document) > succeed = nullptr,
-              std::function< void(const QNetworkReply::NetworkError &error) >fail = nullptr,
-              std::function< void(const float &progress) >progress = nullptr);
+              const QVariant parameters);
 
 signals:
 
@@ -33,10 +30,6 @@ private:
 private slots:
 
     void replyFinished(QNetworkReply *reply);
-
-    void upLoadError(QNetworkReply::NetworkError errorCode);
-
-    void OnUploadProgress(qint64 bytesSent, qint64 bytesTotal);
 };
 
 #endif // NETWORKMANAGER_H
