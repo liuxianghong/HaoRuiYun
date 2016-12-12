@@ -5,7 +5,8 @@ HttpRequest::HttpRequest(QNetworkReply *reply, QObject *parent) : QObject(parent
     m_JSONResponse(0),
     m_StringResponse(0),
     m_DataResponse(0),
-    m_Progress(0)
+    m_Progress(0),
+    m_ResponseType(JSON)
 {
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(reciveError(QNetworkReply::NetworkError)));
     connect(reply, SIGNAL(uploadProgress(qint64 ,qint64)), this, SLOT( uploadProgress(qint64 ,qint64)));
@@ -43,6 +44,7 @@ QNetworkRequest HttpRequest::creatNetworkRequest()
 
 //    QNetworkRequest request(url);
 //    request.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/json"));
+    return QNetworkRequest();
 }
 
 void HttpRequest::reciveError(QNetworkReply::NetworkError errorCode)
@@ -57,14 +59,13 @@ void HttpRequest::uploadProgress(qint64 bytesSent, qint64 bytesTotal)
 
 void HttpRequest::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
-    qDebug() << "bytesSent: " << bytesReceived << "  bytesTotal: "<< bytesTotal;
+    qDebug() << "bytesReceived: " << bytesReceived << "  bytesTotal: "<< bytesTotal;
 }
 
 void HttpRequest::finished()
 {
     if(m_reply->error() == QNetworkReply::NoError){
-        qDebug()<<"no error.....";
-        QByteArray bytes = m_reply->readAll();  //获取字节
+        QByteArray bytes = m_reply->readAll();
         if(m_JSONResponse) {
             QJsonParseError error;
             QJsonDocument jsonDocument = QJsonDocument::fromJson(bytes,&error);
@@ -76,9 +77,6 @@ void HttpRequest::finished()
         if(m_DataResponse){
             m_DataResponse(true,bytes);
         }
-
-//        ;  //转化为字符串
-//        qDebug()<<result;
     } else {
         if(m_JSONResponse) {
             m_JSONResponse(false,QJsonDocument());
@@ -90,5 +88,4 @@ void HttpRequest::finished()
             m_DataResponse(true,QByteArray());
         }
     }
-    m_reply->error(m_reply->error());
 }

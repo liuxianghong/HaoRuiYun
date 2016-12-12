@@ -31,7 +31,6 @@ MainWindow::MainWindow(QWidget *parent) :
     map["password"] = "18672788959";
     NetworkManager::self()->post("http://139.224.194.190:8088/login"
                                  ,map)->responseJSON([](const bool scucess, const QJsonDocument &json){
-
         if(scucess){
             QJsonObject jobject = json.object();
             int result = jobject.find("result").value().toVariant().toInt();
@@ -44,8 +43,16 @@ MainWindow::MainWindow(QWidget *parent) :
                          <<"id:"<<id<<"nickName:"<<nickName;
             }
         }
-
     });
+
+    map["password"] = "186727889591";
+    NetworkManager::self()->post("http://139.224.194.190:8088/login"
+                                 ,map)->responseString([](const bool scucess, const QString &string){
+        if(scucess){
+            qDebug() << "client succeedCallback: result:" <<string;
+        }
+    });
+
 }
 
 MainWindow::~MainWindow()
