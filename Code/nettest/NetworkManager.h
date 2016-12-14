@@ -19,6 +19,9 @@ public:
     HttpRequest *post(const QString url,
               const QVariant parameters);
 
+    HttpRequest *get(const QString url,
+              const QVariant parameters = QVariant());
+
 signals:
 
 public slots:
@@ -30,6 +33,7 @@ private:
 private slots:
 
     void replyFinished(QNetworkReply *reply);
+    void replySslErrors(QNetworkReply *reply,QList<QSslError> errorList);
 };
 
 #endif // NETWORKMANAGER_H

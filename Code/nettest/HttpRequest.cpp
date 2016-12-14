@@ -82,10 +82,10 @@ void HttpRequest::finished()
             m_JSONResponse(false,QJsonDocument());
         }
         if(m_StringResponse){
-            m_StringResponse(true,QString());
+            m_StringResponse(false,QString());
         }
         if(m_DataResponse){
-            m_DataResponse(true,QByteArray());
+            m_DataResponse(false,QByteArray());
         }
     }
 }

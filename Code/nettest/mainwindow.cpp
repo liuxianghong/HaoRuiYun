@@ -54,16 +54,15 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     });
 
-    QImage image(100,100,QImage::Format_ARGB32);
-    image.fill(Qt::blue);
-    FileManager::self()->saveImage(&image,"www.baidu.com");
-    QImage image2 = FileManager::self()->getImage("www.baidu.com");
-    if (image2.isNull()) {
-        ui->label->setText("no image");
-    }
-    else {
-        ui->label->setPixmap(QPixmap::fromImage(image2));
-    }
+    FileManager::self()->getImage("https://static.pgyer.com/static-20161125/assets/img/footer_service.png",[=](const bool success, const QImage &image){
+        if (image.isNull()) {
+            ui->label->setText("no image");
+        }
+        else {
+            ui->label->setPixmap(QPixmap::fromImage(image));
+        }
+    });
+
 
 }
 

@@ -1,10 +1,13 @@
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 
+#include <functional>
 #include <QObject>
 #include <QFile>
 #include <QDir>
 #include <QImage>
+
+typedef std::function< void(const bool success, const QImage &image) > imageFileCompleteHandle;
 
 class FileManager : public QObject
 {
@@ -15,9 +18,11 @@ public:
 
     static FileManager *self();
 
+    void getImage(QString url, imageFileCompleteHandle handle = nullptr);
+private:
     bool saveImage(QImage *image, QString url);
 
-    QImage getImage(QString url);
+    QImage getCacheImage(QString url);
 
 private:
     QString m_cachePath;

@@ -6,6 +6,9 @@ NetworkManager::NetworkManager(QObject *parent) : QObject(parent)
 {
     m_networkManager = new QNetworkAccessManager(this);
     connect(m_networkManager,SIGNAL(finished(QNetworkReply*)),SLOT(replyFinished(QNetworkReply*)));
+    connect(m_networkManager
+            ,SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>))
+            ,SLOT(replySslErrors(QNetworkReply*,QList<QSslError>)));
 }
 
 NetworkManager *NetworkManager::self()
@@ -30,42 +33,42 @@ HttpRequest *NetworkManager::post(const QString url
     return httpRequest;
 }
 
+HttpRequest *NetworkManager::get(const QString url, const QVariant parameters)
+{
+    QNetworkRequest request(url);
+//    QSslConfiguration config ;
+//     config.setPeerVerifyMode(QSslSocket::VerifyNone);
+//     config.setProtocol(QSsl::SslV3);
+//     request.setSslConfiguration(config);
+    //request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
+    //request.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/json"));
+    QNetworkReply *reply = m_networkManager->get(request);
+    reply->ignoreSslErrors();
+    HttpRequest *httpRequest = new HttpRequest(reply,0);
+    return httpRequest;
+}
+
 
 void NetworkManager::replyFinished(QNetworkReply *reply)
 {
     if(reply->error() == QNetworkReply::NoError)
     {
-        qDebug()<<"no error.....";
-//        QByteArray bytes = reply->readAll();  //获取字节
-//        QJsonParseError error;
-//        QJsonDocument jsonDocument = QJsonDocument::fromJson(bytes,&error);
-//        if (error.error == QJsonParseError::NoError) {
-//            if (requsts.contains(reply)){
-//                JQNetworkOnReceivedCallbackPackage package = requsts[reply];
-//                if (package.succeedCallback) {
-//                    package.succeedCallback(jsonDocument);
-//                }
-//            }
-//        }
-//        QString result(bytes);  //转化为字符串
-//        qDebug()<<result;
 
     }
     else{
-        qDebug() << "replyFinished:  " << reply->error() << " " <<reply->errorString();
-//        if (requsts.contains(reply)){
-//            JQNetworkOnReceivedCallbackPackage package = requsts[reply];
-//            if (package.failCallback) {
-//                package.failCallback(reply->error());
-//            }
-//        }
-    }
 
+    }
     QVariant status_code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
     qDebug()<<status_code;
     HttpRequest *http = requsts[reply];
     requsts.remove(reply);
     http->deleteLater();
     reply->deleteLater();
+}
+
+void NetworkManager::replySslErrors(QNetworkReply *reply, QList<QSslError> errorList)
+{
+    qDebug()<<"replySslErrors"<<errorList;
+    reply->ignoreSslErrors(errorList);
 }
 
