@@ -17,11 +17,13 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     KUploadFile.cpp \
     NetworkManager.cpp \
-    HttpRequest.cpp
+    HttpRequest.cpp \
+    FileManager.cpp
 
 HEADERS  += mainwindow.h \
     KUploadFile.h \
     NetworkManager.h \
-    HttpRequest.h
+    HttpRequest.h \
+    FileManager.h
 
 FORMS    += mainwindow.ui
