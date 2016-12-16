@@ -34,6 +34,16 @@ void FileManager::getImage(QString url, imageFileCompleteHandle handle)
     });
 }
 
+QString FileManager::getLogPath()
+{
+    QDir dir = QDir(m_cachePath);
+    dir.mkdir("Logs");
+    if (dir.cd("Logs")){
+        return dir.absolutePath();
+    }
+    return "";
+}
+
 bool FileManager::saveImage(QImage *image, QString url)
 {
     if (image->isNull())
@@ -43,7 +53,6 @@ bool FileManager::saveImage(QImage *image, QString url)
     if (dir.cd("Images")){
         QString urlMD5 = QCryptographicHash::hash(url.toUtf8(), QCryptographicHash::Md5).toHex();
         QString fileName = dir.absoluteFilePath(urlMD5);
-        qDebug()<<fileName;
         return image->save(fileName,"PNG");
     }
     return false;

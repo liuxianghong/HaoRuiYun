@@ -19,6 +19,8 @@ public:
     static FileManager *self();
 
     void getImage(QString url, imageFileCompleteHandle handle = nullptr);
+
+    QString getLogPath();
 private:
     bool saveImage(QImage *image, QString url);
 

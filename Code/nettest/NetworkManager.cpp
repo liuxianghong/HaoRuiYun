@@ -35,15 +35,27 @@ HttpRequest *NetworkManager::post(const QString url
 
 HttpRequest *NetworkManager::get(const QString url, const QVariant parameters)
 {
-    QNetworkRequest request(url);
-//    QSslConfiguration config ;
-//     config.setPeerVerifyMode(QSslSocket::VerifyNone);
-//     config.setProtocol(QSsl::SslV3);
-//     request.setSslConfiguration(config);
-    //request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
-    //request.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/json"));
+    QMap<QString, QVariant> map = parameters.toMap();
+    QMap<QString, QVariant>::const_iterator i = map.constBegin();
+    QString parame;
+    while (i != map.constEnd()) {
+        if (!i.value().isValid() || i.value().isNull()) {
+            ++i;
+            continue;
+        }
+        if (!parame.isEmpty()){
+            parame.append("&");
+        }
+        parame.append(i.key() + "=" + i.value().toString());
+        ++i;
+    }
+    QString requestUrl = url;
+    if (!parame.isEmpty()) {
+        requestUrl.append("?" + parame);
+    }
+    qDebug()<<requestUrl;
+    QNetworkRequest request(requestUrl);
     QNetworkReply *reply = m_networkManager->get(request);
-    reply->ignoreSslErrors();
     HttpRequest *httpRequest = new HttpRequest(reply,0);
     return httpRequest;
 }
