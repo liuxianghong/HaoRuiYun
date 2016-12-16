@@ -163,16 +163,16 @@ void Logger::MessageOutput(QtMsgType type, const QMessageLogContext &context, co
     switch (type) {
     case QtDebugMsg:
     case QtInfoMsg:
-        fprintf(stdout, msg.toLocal8Bit());
+        fprintf(stdout, msg.toLocal8Bit() + "\n");
         fflush(stdout);
         break;
     case QtCriticalMsg:
     case QtWarningMsg:
-        fprintf(stderr, msg.toLocal8Bit());
+        fprintf(stderr, msg.toLocal8Bit() + "\n");
         fflush(stderr);
         break;
     case QtFatalMsg:
-        fprintf(stderr, msg.toLocal8Bit());
+        fprintf(stderr, msg.toLocal8Bit() + "\n");
         fflush(stderr);
         abort();
     default:

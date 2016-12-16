@@ -21,40 +21,66 @@ NetworkManager *NetworkManager::self()
 
 HttpRequest *NetworkManager::post(const QString url
                           , const QVariant parameters
-                          )
+                          , const QVariantMap headers)
 {
     QJsonDocument jsonDocument = QJsonDocument::fromVariant(parameters);
 
     QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/json"));
+    QMap<QString, QVariant>::const_iterator h = headers.constBegin();
+    while (h != headers.constEnd()) {
+        if (!h.value().isValid() || h.value().isNull()) {
+            ++h;
+            continue;
+        }
+        request.setRawHeader(h.key().toUtf8(),h.value().toString().toUtf8());
+        ++h;
+    }
+    if (!headers.contains("Content-Type") || !headers["Content-Type"].isValid()) {
+        request.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/json"));
+    }
+
     QNetworkReply *reply = m_networkManager->post(request,jsonDocument.toJson());
     HttpRequest *httpRequest = new HttpRequest(reply,0);
     requsts[reply] = httpRequest;
     return httpRequest;
 }
 
-HttpRequest *NetworkManager::get(const QString url, const QVariant parameters)
+HttpRequest *NetworkManager::get(const QString url, const QVariant parameters, const QVariantMap headers)
 {
+
     QMap<QString, QVariant> map = parameters.toMap();
     QMap<QString, QVariant>::const_iterator i = map.constBegin();
-    QString parame;
+
+    QStringList parameList;
     while (i != map.constEnd()) {
         if (!i.value().isValid() || i.value().isNull()) {
             ++i;
             continue;
         }
-        if (!parame.isEmpty()){
-            parame.append("&");
-        }
-        parame.append(i.key() + "=" + i.value().toString());
+        parameList << i.key() + "=" + i.value().toString();
         ++i;
     }
+    QString parame = parameList.join("&");
     QString requestUrl = url;
     if (!parame.isEmpty()) {
         requestUrl.append("?" + parame);
     }
     qDebug()<<requestUrl;
     QNetworkRequest request(requestUrl);
+
+    QMap<QString, QVariant>::const_iterator h = headers.constBegin();
+    while (h != headers.constEnd()) {
+        if (!h.value().isValid() || h.value().isNull()) {
+            ++h;
+            continue;
+        }
+        request.setRawHeader(h.key().toUtf8(),h.value().toString().toUtf8());
+        ++h;
+    }
+    if (!headers.contains("Content-Type") || !headers["Content-Type"].isValid()) {
+        request.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/json"));
+    }
+
     QNetworkReply *reply = m_networkManager->get(request);
     HttpRequest *httpRequest = new HttpRequest(reply,0);
     return httpRequest;

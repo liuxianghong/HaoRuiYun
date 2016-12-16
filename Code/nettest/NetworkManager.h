@@ -17,10 +17,12 @@ public:
     static NetworkManager *self();
 
     HttpRequest *post(const QString url,
-              const QVariant parameters);
+                      const QVariant parameters,
+                      const QVariantMap headers = QVariantMap());
 
     HttpRequest *get(const QString url,
-              const QVariant parameters = QVariant());
+                     const QVariant parameters = QVariant(),
+                     const QVariantMap headers = QVariantMap());
 
 signals:
 
