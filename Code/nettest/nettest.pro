@@ -18,12 +18,14 @@ SOURCES += main.cpp\
     KUploadFile.cpp \
     NetworkManager.cpp \
     HttpRequest.cpp \
-    FileManager.cpp
+    FileManager.cpp \
+    Logger.cpp
 
 HEADERS  += mainwindow.h \
     KUploadFile.h \
     NetworkManager.h \
     HttpRequest.h \
-    FileManager.h
+    FileManager.h \
+    Logger.h
 
 FORMS    += mainwindow.ui

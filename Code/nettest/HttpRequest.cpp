@@ -72,7 +72,7 @@ void HttpRequest::finished()
             m_JSONResponse(error.error == QJsonParseError::NoError,jsonDocument);
         }
         if(m_StringResponse){
-            m_StringResponse(true,QString(bytes));
+            m_StringResponse(true,QString::fromUtf8(bytes));
         }
         if(m_DataResponse){
             m_DataResponse(true,bytes);
