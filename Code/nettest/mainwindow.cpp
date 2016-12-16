@@ -14,7 +14,10 @@ MainWindow::MainWindow(QWidget *parent) :
         this->test();
     });
 
-    Logger::self();
+
+    Logger::self()->setLogLevel(LoggerDebug);
+
+    startTimer(100);
 }
 
 MainWindow::~MainWindow()
@@ -86,4 +89,8 @@ void MainWindow::test(){
                 qDebug() << "client succeedCallback: result:" <<string;
             }
         });
+}
+
+void MainWindow::timerEvent(QTimerEvent *event)
+{
 }

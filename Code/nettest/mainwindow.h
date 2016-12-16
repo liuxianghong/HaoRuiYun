@@ -19,6 +19,10 @@ private:
     Ui::MainWindow *ui;
 
     void test();
+
+    // QObject interface
+protected:
+    void timerEvent(QTimerEvent *event);
 };
 
 #endif // MAINWINDOW_H
