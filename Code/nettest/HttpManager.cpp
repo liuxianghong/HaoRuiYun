@@ -1,8 +1,8 @@
-#include "NetworkManager.h"
+#include "HttpManager.h"
 
-static NetworkManager *p_networkManager = 0;
+static HttpManager *p_httpManager = 0;
 
-NetworkManager::NetworkManager(QObject *parent) : QObject(parent)
+HttpManager::HttpManager(QObject *parent) : QObject(parent)
 {
     m_networkManager = new QNetworkAccessManager(this);
     connect(m_networkManager,SIGNAL(finished(QNetworkReply*)),SLOT(replyFinished(QNetworkReply*)));
@@ -11,15 +11,15 @@ NetworkManager::NetworkManager(QObject *parent) : QObject(parent)
             ,SLOT(replySslErrors(QNetworkReply*,QList<QSslError>)));
 }
 
-NetworkManager *NetworkManager::self()
+HttpManager *HttpManager::self()
 {
-    if (p_networkManager == 0){
-        p_networkManager = new NetworkManager(0);
+    if (p_httpManager == 0){
+        p_httpManager = new HttpManager(0);
     }
-    return p_networkManager;
+    return p_httpManager;
 }
 
-HttpRequest *NetworkManager::post(const QString url
+HttpRequest *HttpManager::post(const QString url
                           , const QVariant parameters
                           , const QVariantMap headers)
 {
@@ -45,7 +45,7 @@ HttpRequest *NetworkManager::post(const QString url
     return httpRequest;
 }
 
-HttpRequest *NetworkManager::get(const QString url, const QVariant parameters, const QVariantMap headers)
+HttpRequest *HttpManager::get(const QString url, const QVariant parameters, const QVariantMap headers)
 {
 
     QMap<QString, QVariant> map = parameters.toMap();
@@ -87,7 +87,7 @@ HttpRequest *NetworkManager::get(const QString url, const QVariant parameters, c
 }
 
 
-void NetworkManager::replyFinished(QNetworkReply *reply)
+void HttpManager::replyFinished(QNetworkReply *reply)
 {
     if(reply->error() == QNetworkReply::NoError)
     {
@@ -104,7 +104,7 @@ void NetworkManager::replyFinished(QNetworkReply *reply)
     reply->deleteLater();
 }
 
-void NetworkManager::replySslErrors(QNetworkReply *reply, QList<QSslError> errorList)
+void HttpManager::replySslErrors(QNetworkReply *reply, QList<QSslError> errorList)
 {
     qDebug()<<"replySslErrors"<<errorList;
     reply->ignoreSslErrors(errorList);

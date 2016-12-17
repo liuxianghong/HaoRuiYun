@@ -13,15 +13,8 @@ class HttpRequest : public QObject
 {
     Q_OBJECT
 
-    enum ResponseType {
-        JSON = 0,
-        String,
-        Data
-    };
-
-public:
     explicit HttpRequest(QNetworkReply *reply,QObject *parent = 0);
-
+public:
     HttpRequest *responseString(HttpStringResponse response);
     HttpRequest *responseJSON(HttpJSONResponse response);
     HttpRequest *responseData(HttpDataResponse response);
@@ -38,7 +31,8 @@ private:
     HttpStringResponse m_StringResponse;
     HttpDataResponse m_DataResponse;
     HttpProgress m_Progress;
-    ResponseType m_ResponseType;
+
+    friend class HttpManager;
 
 private slots:
     void reciveError(QNetworkReply::NetworkError errorCode);

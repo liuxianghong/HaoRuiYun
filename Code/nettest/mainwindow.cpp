@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "NetworkManager.h"
+#include "HttpManager.h"
 #include "FileManager.h"
 #include "Logger.h"
 
@@ -46,7 +46,7 @@ void MainWindow::test(){
         QVariantMap map;
         map["userName"] = "18672788959";
         map["password"] = "18672788959";
-        NetworkManager::self()->post("http://139.224.194.190:8088/login"
+        HttpManager::self()->post("http://139.224.194.190:8088/login"
                                      ,map)->responseJSON([](const bool scucess, const QJsonDocument &json){
             if(scucess){
                 QJsonObject jobject = json.object();
@@ -63,14 +63,14 @@ void MainWindow::test(){
         });
 
         map["password"] = "186727889591";
-        NetworkManager::self()->post("http://139.224.194.190:8088/login"
+        HttpManager::self()->post("http://139.224.194.190:8088/login"
                                      ,map)->responseString([](const bool scucess, const QString &string){
             if(scucess){
                 qDebug() << "client succeedCallback: result:" <<string;
             }
         });
 
-        FileManager::self()->getImage("https://static.pgyer.com/static-20161125/assets/img/footer_service.png",[=](const bool success, const QImage &image){
+        FileManager::self()->getImage("http://img.ivsky.com/img/bizhi/pre/201611/17/i_pace-001.jpg",[=](const bool success, const QImage &image){
             if (image.isNull()) {
                 ui->label->setText("no image");
             }
@@ -83,7 +83,7 @@ void MainWindow::test(){
         map2["page"] = 1;
         map2["rows"] = 2;
 
-        NetworkManager::self()->get("http://139.224.194.190:8088/getAllUsersE"
+        HttpManager::self()->get("http://139.224.194.190:8088/getAllUsersE"
                                      ,map2)->responseString([](const bool scucess, const QString &string){
             if(scucess){
                 qDebug() << "client succeedCallback: result:" <<string;

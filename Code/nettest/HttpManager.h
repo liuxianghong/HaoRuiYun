@@ -8,13 +8,13 @@
 #include "HttpRequest.h"
 
 
-class NetworkManager : public QObject
+class HttpManager : public QObject
 {
     Q_OBJECT
 
-    explicit NetworkManager(QObject *parent = 0);
+    explicit HttpManager(QObject *parent = 0);
 public:
-    static NetworkManager *self();
+    static HttpManager *self();
 
     HttpRequest *post(const QString url,
                       const QVariant parameters,

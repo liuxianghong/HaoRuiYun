@@ -2,7 +2,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QCryptographicHash>
-#include "NetworkManager.h"
+#include "HttpManager.h"
 #include <QPixmap>
 
 static FileManager *p_fileManager = 0;
@@ -23,7 +23,7 @@ void FileManager::getImage(QString url, imageFileCompleteHandle handle)
             handle(true, image);
     }
 
-    NetworkManager::self()->get(url)->responseData([=](const bool success, const QByteArray &data){
+    HttpManager::self()->get(url)->responseData([=](const bool success, const QByteArray &data){
         QImage image;
         if (success){
             image.loadFromData(data);

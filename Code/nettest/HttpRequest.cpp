@@ -5,13 +5,16 @@ HttpRequest::HttpRequest(QNetworkReply *reply, QObject *parent) : QObject(parent
     m_JSONResponse(0),
     m_StringResponse(0),
     m_DataResponse(0),
-    m_Progress(0),
-    m_ResponseType(JSON)
+    m_Progress(0)
 {
-    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(reciveError(QNetworkReply::NetworkError)));
     connect(reply, SIGNAL(uploadProgress(qint64 ,qint64)), this, SLOT( uploadProgress(qint64 ,qint64)));
     connect(reply, SIGNAL(downloadProgress(qint64 ,qint64)), this, SLOT( downloadProgress(qint64 ,qint64)));
     connect(reply, SIGNAL(finished()), this, SLOT( finished()));
+
+    connect(reply, static_cast<void(QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error),
+         [=](QNetworkReply::NetworkError code){
+        this->reciveError(code);
+    });
 }
 
 HttpRequest *HttpRequest::responseString(HttpStringResponse response)
@@ -38,18 +41,10 @@ HttpRequest *HttpRequest::progress(HttpProgress response)
     return this;
 }
 
-QNetworkRequest HttpRequest::creatNetworkRequest()
-{
-//    QJsonDocument jsonDocument = QJsonDocument::fromVariant(parameters);
-
-//    QNetworkRequest request(url);
-//    request.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/json"));
-    return QNetworkRequest();
-}
-
 void HttpRequest::reciveError(QNetworkReply::NetworkError errorCode)
 {
-    qDebug() << "upLoadError  errorCode: " << (int)errorCode;
+    qWarning() << "HttpRequest reciveError  errorCode: " << (int)errorCode
+             <<" errorString: "<< m_reply->errorString();
 }
 
 void HttpRequest::uploadProgress(qint64 bytesSent, qint64 bytesTotal)

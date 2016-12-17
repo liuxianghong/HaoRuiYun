@@ -16,18 +16,16 @@ CONFIG *= c++14
 SOURCES += main.cpp\
         mainwindow.cpp \
     KUploadFile.cpp \
-    NetworkManager.cpp \
     HttpRequest.cpp \
     FileManager.cpp \
     Logger.cpp \
-    HttpResult.cpp
+    HttpManager.cpp
 
 HEADERS  += mainwindow.h \
     KUploadFile.h \
-    NetworkManager.h \
     HttpRequest.h \
     FileManager.h \
     Logger.h \
-    HttpResult.h
+    HttpManager.h
 
 FORMS    += mainwindow.ui
